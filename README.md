@@ -1,4 +1,4 @@
-# 🦇 BiteFight Bot Pro v30.1 (AJAX Edition)
+# 🦇 BiteFight Bot Pro v30.2 (AJAX Edition)
 
 Zaawansowany, niewykrywalny skrypt (Userscript) do gry BiteFight, operujący w 100% w tle z wykorzystaniem technologii AJAX i fetch. Skrypt oszczędza transfer, nie przeładowuje strony i automatyzuje żmudne, codzienne czynności w grze.
 
