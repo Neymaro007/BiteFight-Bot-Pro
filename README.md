@@ -6,6 +6,8 @@
 
 Zaawansowany, niewykrywalny skrypt (Userscript) do gry BiteFight, operujący w 100% w tle z wykorzystaniem technologii AJAX i fetch. Skrypt oszczędza transfer, nie przeładowuje strony i automatyzuje żmudne, codzienne czynności w grze.
 
+
+
 ## 🌟 Główne Funkcje
 
 - **Rozbudowany Panel GUI:** Elegancki i mroczny interfejs w lewym rogu ekranu, pasujący do klimatu gry.
