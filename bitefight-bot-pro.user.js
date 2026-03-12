@@ -3,7 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version      30.2
 // @description  Oryginalne GUI. 100% poprawny payload dla wszystkich funkcji gry i inteligentne zarządzanie PA.
-// @author       Shakira & Pomocnik
+// @author       ANONYMOUS
 // @match        https://*.bitefight.gameforge.com/*
 // @grant        none
 // @run-at       document-idle
