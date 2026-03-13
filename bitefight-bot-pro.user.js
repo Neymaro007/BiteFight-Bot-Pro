@@ -5,7 +5,7 @@
 // @description  W pełni konfigurowalne leczenie, 100% poprawny payload, obsługa kościoła.
 // @author       Neymaro007
 // @match        https://*.bitefight.gameforge.com/*
-// @grant        none
+// @grant        none 
 // @run-at       document-idle
 // ==/UserScript==
 
