@@ -3,7 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version      30.3
 // @description  W pełni konfigurowalne leczenie, 100% poprawny payload, obsługa kościoła.
-// @author       Neymaro007
+// @author       Shakira & Pomocnik
 // @match        https://*.bitefight.gameforge.com/*
 // @grant        none
 // @run-at       document-idle
@@ -581,25 +581,40 @@
         if (savedAttrs.length === 0) return false;
 
         const attrRows = profileDoc.querySelectorAll("#skills_tab table tr");
+        let availableUpgrades = []; // Tu bot zbierze atrybuty, na które go stać
+
         for (let row of Array.from(attrRows)) {
             const labelTd = row.querySelector("td:first-child");
             if (!labelTd) continue;
 
             const attrName = labelTd.textContent.replace(':', '').trim();
-            if (!savedAttrs.includes(attrName)) continue;
+            if (!savedAttrs.includes(attrName)) continue; // Ignoruje niezaznaczone
 
             const costMatch = row.textContent.match(/kosztuje:\s*([\d.]+)/i);
             if (costMatch) {
                 const cost = parseInt(costMatch[1].replace(/\./g, ''), 10);
                 const plusBtnLink = row.querySelector("a[href*='/profile/training/']");
+
+                // Jeśli stać nas na ten atrybut, dodajemy go do "koszyka"
                 if (plusBtnLink && stats.gold >= cost) {
-                    logToGUI(`💪 Ulepszam '${attrName}' za ${cost} złota!`, "#ffff00");
-                    await wait(getRandomDelay());
-                    await submitBackgroundFormOrLink(plusBtnLink, profileLink);
-                    return true;
+                    availableUpgrades.push({ name: attrName, cost: cost, btn: plusBtnLink });
                 }
             }
         }
+
+        // Jeśli mamy na liście przynajmniej jeden atrybut, na który nas stać...
+        if (availableUpgrades.length > 0) {
+            // ...sortujemy je po cenie rosnąco (najtańszy ląduje na początku listy)
+            availableUpgrades.sort((a, b) => a.cost - b.cost);
+            const cheapestUpgrade = availableUpgrades[0];
+
+            logToGUI(`💪 Ulepszam '${cheapestUpgrade.name}' za ${cheapestUpgrade.cost} złota (Najtańszy)!`, "#ffff00");
+            await wait(getRandomDelay());
+            await submitBackgroundFormOrLink(cheapestUpgrade.btn, profileLink);
+            return true;
+        }
+
+        // Jeśli bota nie stać na NIC, usypia moduł atrybutów na 5 minut
         localStorage.setItem('bot_NextAttrCheck', (Date.now() + 5 * 60 * 1000).toString());
         return false;
     }
