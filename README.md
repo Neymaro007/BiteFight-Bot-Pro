@@ -9,7 +9,7 @@ Zaawansowany, wysoce zoptymalizowany skrypt automatyzujący (Userscript) przezna
 
 Dzięki pełnemu wdrożeniu asynchronicznych zapytań sieciowych (**AJAX / Fetch API**), bot operuje w 100% w tle. **Nie wymaga przeładowywania strony**, nie blokuje interfejsu gry i pozwala na swobodne przeglądanie innych zakładek, podczas gdy Twoja postać nieustannie się rozwija.
 
-![Interfejs Bota BiteFIght](bot1.png) ![Interfejs Bota BiteFIght](bot2.png) ![Interfejs Bota BiteFIght](bot3.png)
+![Interfejs Bota BiteFIght](1.png) ![Interfejs Bota BiteFIght](2.png) ![Interfejs Bota BiteFIght](3.png)
 
 ## 🌟 Główne Funkcje (Features)
 
