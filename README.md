@@ -1,8 +1,8 @@
 # 🦇 BiteFight Bot Pro v30.2 (AJAX Edition)
 
-![Wersja](https://img.shields.io/badge/Wersja-v30.2-blue.svg)
-![Język](https://img.shields.io/badge/J%C4%99zyk-JavaScript-yellow.svg)
-![Tampermonkey](https://img.shields.io/badge/Wtyczka-Tampermonkey-green.svg)
+![Version](https://img.shields.io/badge/version-30.2-blue.svg)
+![Platform](https://img.shields.io/badge/platform-Tampermonkey-green.svg)
+![Game](https://img.shields.io/badge/game-BiteFight-darkred.svg)
 
 Zaawansowany, wysoce zoptymalizowany skrypt automatyzujący (Userscript) przeznaczony dla gry przeglądarkowej BiteFight. Projekt został stworzony z myślą o maksymalnej wydajności i dyskrecji. 
 
