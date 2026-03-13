@@ -4,41 +4,54 @@
 ![Język](https://img.shields.io/badge/J%C4%99zyk-JavaScript-yellow.svg)
 ![Tampermonkey](https://img.shields.io/badge/Wtyczka-Tampermonkey-green.svg)
 
-Zaawansowany, niewykrywalny skrypt (Userscript) do gry BiteFight, operujący w 100% w tle z wykorzystaniem technologii AJAX i fetch. Skrypt oszczędza transfer, nie przeładowuje strony i automatyzuje żmudne, codzienne czynności w grze.
+Zaawansowany, wysoce zoptymalizowany skrypt automatyzujący (Userscript) przeznaczony dla gry przeglądarkowej BiteFight. Projekt został stworzony z myślą o maksymalnej wydajności i dyskrecji. 
+
+Dzięki pełnemu wdrożeniu asynchronicznych zapytań sieciowych (**AJAX / Fetch API**), bot operuje w 100% w tle. **Nie wymaga przeładowywania strony**, nie blokuje interfejsu gry i pozwala na swobodne przeglądanie innych zakładek, podczas gdy Twoja postać nieustannie się rozwija.
 
 ![Interfejs Bota BiteFIght](bot1.png) ![Interfejs Bota BiteFIght](bot2.png) ![Interfejs Bota BiteFIght](bot3.png)
 
-## 🌟 Główne Funkcje
+## 🌟 Główne Funkcje (Features)
 
-- **Rozbudowany Panel GUI:** Elegancki i mroczny interfejs w lewym rogu ekranu, pasujący do klimatu gry.
-- **Logi w czasie rzeczywistym:** Monitoruj działania bota na bieżąco, bez odświeżania strony.
-- **Praca w tle (AJAX):** Bot nie przeszkadza w przeglądaniu innych zakładek gry.
-- **Inteligentne zarządzanie PA:**
-  - Odbieranie Sfer Ekstrakcji zgodnie z wybraną rangą (od S do F).
-  - Polowanie w wybranych lokacjach z uwzględnieniem Sfer.
-  - Wykonywanie zadań w Lesie na podstawie wybranej strategii (Exp, Złoto, Aspekty).
-  - Automatyczne wyjście z Lasu i podjęcie Pracy na Cmentarzu, gdy PA spadnie poniżej ustalonego progu.
-- **Zarządzanie Postacią:**
-  - Auto-leczenie i odnawianie energii (Mikstury i Kościół).
-  - Automatyczny zakup brakujących mikstur na Rynku.
-  - Trening atrybutów.
-  - Rekrutacja jednostek w Jamie Lęgowej.
-- **Wojny i Walka:**
-  - Automatyczny, cykliczny meldunek na Wojny Klanowe (co 10 minut).
-  - Atakowanie potworów w Ruinach Pradziejów (z obsługą poziomów 1-5). Możliwość dodania więcej.
-  - Walki z Demonami w Grocie.
+### 💻 Nowoczesny Interfejs Użytkownika (GUI)
+* **Pływający Panel Konfiguracyjny:** Elegancki, dopasowany do klimatu gry panel boczny, pozwalający na zarządzanie wszystkimi modułami bota w czasie rzeczywistym.
+* **Konsola Logów (Live):** Zintegrowany podgląd działań bota. Śledź na bieżąco zdobywane Sfery, postęp w Lesie czy zakupy w Jamie Lęgowej, bez konieczności otwierania konsoli deweloperskiej.
+* **Zabezpieczenia anty-blokadowe:** Konfigurowalne opóźnienia kliknięć (od trybu "Szybki" po "Bezpieczny/Ludzki"), zapobiegające wykryciu nienaturalnej aktywności przez serwer.
 
-## ⚙️ Instalacja
+### ⚔️ Moduł Polowania i Przygód
+* **Zaawansowane Sfery Ekstrakcji:** Inteligentny odbiór Sfer na podstawie wybranych rang (od S do F). Bot potrafi ominąć pętle przekierowań serwera (Status 303) i bezpiecznie deponować łupy w slotach.
+* **Przygoda w Lesie z systemem logiki:** Rozpoznawanie aktualnego postępu misji (np. *90/120*). Konfigurowalne strategie wyborów (Max Exp/Złoto, Aspekty Natury, Zniszczenia, Wiedzy itp.). Bot inteligentnie dokończy aktywną przygodę przed zmianą zadania.
+* **Grota i Polowanie na Ludzi:** Zautomatyzowane ataki z pełną obsługą Punktów Akcji (PA).
 
-Aby zainstalować skrypt, potrzebujesz rozszerzenia do przeglądarki:
-- [Tampermonkey dla Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
-- [Tampermonkey dla Firefox](https://addons.mozilla.org/pl/firefox/addon/tampermonkey/)
+### 🏰 Wojna i Taktyka
+* **Ruiny Pradziejów:** Precyzyjne uderzenia w wybrane piętra (1-5) z idealnie sformatowanym ładunkiem danych (payload), omijającym błędne komunikaty serwera.
+* **Auto-Meldunek Klanowy:** Bot działa jako asystent wojenny, cyklicznie sprawdzając kwaterę główną (co 10 minut) i automatycznie dołączając do wojen klanowych.
 
-Gdy masz już Tampermonkey:
-1. Kliknij w plik **`bitefight-bot-pro.user.js`** w tym repozytorium.
-2. Kliknij przycisk **Raw** (Zwykły tekst) w prawym górnym rogu kodu.
-3. Tampermonkey automatycznie przechwyci skrypt – kliknij **Zainstaluj** (Install).
-4. Wejdź na stronę BiteFight i ciesz się grą!
+### 💰 Zarządzanie Postacią i Ekonomia
+* **Jamy Lęgowe (Wojsko):** Wykorzystanie natywnych instrukcji gry (jQuery $.ajax) do bezbłędnego zakupu wojska za krew, po 1 lub po 10 sztuk, omijając restrykcje nagłówków CSRF.
+* **Rozwój Atrybutów:** Automatyczne inwestowanie nadmiaru złota w wybrane statystyki (Siła, Obrona, Zwinność itp.).
+* **Inteligentny Cmentarz:** Gdy Punkty Akcji (PA) spadną poniżej ustalonego limitu, bot dokończy rozpoczęte misje i wyśle postać do pracy na wyznaczony czas, usypiając swoje procesy dla oszczędności zasobów (komputera/telefonu).
+* **System Regeneracji:** Zautomatyzowane leczenie Kościołem (z limitem maksymalnego kosztu PA) oraz automatyczny zakup i spożywanie mikstur życia/energii z poziomu Rynku.
 
-## ⚠️ Zrzeczenie się odpowiedzialności
-*Ten skrypt został stworzony wyłącznie w celach edukacyjnych. Korzystanie z botów i skryptów automatyzujących może naruszać Regulamin (ToS) firmy Gameforge. Używasz go wyłącznie na własne ryzyko. Twórca nie ponosi odpowiedzialności za ewentualne blokady kont.*
+---
+
+## ⚙️ Instalacja i Wymagania
+
+Skrypt do poprawnego działania wymaga rozszerzenia obsługującego Userscripty.
+
+1. Zainstaluj odpowiednie rozszerzenie dla swojej przeglądarki:
+   * **Chrome / Edge / Opera / Kiwi Browser (Android):** [Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
+   * **Firefox:** [Tampermonkey](https://addons.mozilla.org/pl/firefox/addon/tampermonkey/)
+2. Po zainstalowaniu rozszerzenia, przejdź do zakładki z kodem w tym repozytorium: `bitefight-bot-pro.user.js`
+3. Kliknij przycisk **"Raw"** w prawym górnym rogu podglądu pliku.
+4. Tampermonkey wykryje skrypt automatycznie – kliknij **Zainstaluj (Install)**.
+5. Zaloguj się do gry BiteFight. Panel bota pojawi się w lewym rogu ekranu.
+
+---
+
+## 🛠️ Technologie
+Projekt został napisany w "Vanilla JavaScript" (ES6+) z wykorzystaniem technologii Fetch API, DOMParser oraz selektywnego wykorzystania natywnych funkcji serwerowych gry (jQuery). Skrypt działa w architekturze *document-idle*, zapewniając pełną zgodność z interfejsem BiteFight.
+
+---
+
+## ⚖️ Nota prawna (Disclaimer)
+> Skrypt został stworzony w celach edukacyjnych jako Proof of Concept (PoC) automatyzacji procesów w aplikacjach webowych. Wykorzystywanie oprogramowania automatyzującego ("botów") stanowi naruszenie Regulaminu Usług (Terms of Service) firmy Gameforge. Użytkownik korzysta ze skryptu wyłącznie na własną odpowiedzialność. Twórca nie ponosi odpowiedzialności za ewentualne blokady kont (bany) wynikające z użytkowania tego oprogramowania.
