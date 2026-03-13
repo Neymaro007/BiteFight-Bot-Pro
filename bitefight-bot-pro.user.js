@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         BiteFight Bot Pro v30.2 (FINAL AJAX + Szybszy Klan)
+// @name         BiteFight Bot Pro v30.3 (AJAX GUI + Dynamiczne HP)
 // @namespace    http://tampermonkey.net/
-// @version      30.2
-// @description  Oryginalne GUI. 100% poprawny payload dla wszystkich funkcji gry i inteligentne zarządzanie PA.
+// @version      30.3
+// @description  W pełni konfigurowalne leczenie, 100% poprawny payload, obsługa kościoła.
 // @author       Neymaro007
 // @match        https://*.bitefight.gameforge.com/*
 // @grant        none
@@ -16,13 +16,9 @@
     // 📜 KONFIGURACJA 📜
     //==================================================================
 
-    const healthTriggerPercent = 0.85;
-    const healthCriticalPercent = 0.15;
     const potionScriptCooldown = 31 * 60 * 1000;
     const churchScriptCooldown = 121 * 60 * 1000;
     const ruinsCooldown = 61 * 60 * 1000;
-
-    // ZMIANA: Czas sprawdzania wojen klanowych ustawiony na 10 minut (10 * 60 sekund * 1000 milisekund)
     const clanWarCooldown = 10 * 60 * 1000;
 
     const baseURL = window.location.origin;
@@ -84,7 +80,7 @@
         const panel = document.createElement('div');
         panel.id = 'bf-bot-panel';
         panel.style.cssText = `
-            position: fixed; top: 10px; left: 10px; width: 290px;
+            position: fixed; top: 10px; left: 10px; width: 300px;
             background: linear-gradient(180deg, #1a0a0a 0%, #0d0404 100%);
             border: 2px solid #7a0000; color: #d4d4d4; padding: 12px; z-index: 999999;
             font-family: Tahoma, Arial, sans-serif; font-size: 12px; border-radius: 8px;
@@ -113,7 +109,7 @@
                 #bf-bot-panel::-webkit-scrollbar-track { background: #0d0404; border-radius: 4px; }
                 #bf-bot-panel::-webkit-scrollbar-thumb { background: #7a0000; border-radius: 4px; }
             </style>
-            <h3 style="margin: 0 0 5px 0; text-align: center; color: #ff3333; text-transform: uppercase; letter-spacing: 2px; font-size: 15px; text-shadow: 2px 2px 4px black;">BiteFight Bot v30.2</h3>
+            <h3 style="margin: 0 0 5px 0; text-align: center; color: #ff3333; text-transform: uppercase; letter-spacing: 2px; font-size: 15px; text-shadow: 2px 2px 4px black;">BiteFight Bot v30.3</h3>
             <div style="text-align: center; margin-bottom: 12px;">
                 <label style="color:#aaa; font-size: 11px;">🌍 Serwer:</label>
                 <select id="bot-server-select" class="bf-sel" style="width: auto; display: inline-block; margin-left: 5px; padding: 2px 5px; margin-right: 10px;">
@@ -187,21 +183,34 @@
             <div class="bf-sec" style="margin-bottom: 0;">
                 <div class="bf-sec-title">🩸 Przetrwanie i Regeneracja</div>
                 <div class="bf-row-left"><label style="font-weight:bold; color:#fff;"><input type="checkbox" id="bot-potion-life"> Pij Mikstury Leczące:</label></div>
-                <select id="bot-potion-type" class="bf-sel" style="margin-bottom: 10px;">
+                <select id="bot-potion-type" class="bf-sel" style="margin-bottom: 5px;">
                     <option value="Mała Uzdrawiająca Mikstura">Mała Uzdrawiająca (od 1 lvl)</option><option value="Średnia Uzdrawiająca Mikstura">Średnia Uzdrawiająca (od 3 lvl)</option><option value="Zupa Życia">Zupa Życia (od 75 lvl)</option>
                 </select>
+                <div class="bf-row-left" style="margin-top: 5px;"><label style="font-weight:bold; color:#00ffcc;">╰ Pij miksturę, gdy HP spadnie do:</label></div>
+                <select id="bot-potion-hp" class="bf-sel" style="margin-bottom: 10px;">
+                    <option value="0.90">90%</option><option value="0.80" selected>80%</option><option value="0.70">70%</option><option value="0.60">60%</option><option value="0.50">50%</option>
+                </select>
+
                 <div class="bf-row-left"><label style="font-weight:bold; color:#fff;"><input type="checkbox" id="bot-potion-energy"> Pij Mikstury Energii (PA)</label></div>
                 <div class="bf-row-left" style="margin-top: 10px; margin-bottom: 10px;"><label style="font-weight:bold; color:#00ff00;"><input type="checkbox" id="bot-potion-autobuy"> Auto-Kupowanie brakujących mikstur</label></div>
-                <div class="bf-row-left" style="margin-top: 10px;"><label style="font-weight:bold; color:#ffcc33;">🛡️ Ucieczka (Zakończ Przygodę), gdy HP spadnie do:</label></div>
-                <select id="bot-safe-hp" class="bf-sel" style="margin-bottom: 10px;">
-                    <option value="0.15">15% (Wysokie ryzyko)</option><option value="0.25">25% (Podwyższone ryzyko)</option><option value="0.35">35% (Zbalansowane)</option><option value="0.50">50% (Bezpieczne)</option><option value="0.65">65% (Bardzo ostrożnie)</option>
-                </select>
+
                 <div class="bf-hr"></div>
                 <div class="bf-row-left"><label style="font-weight:bold; color:#fff;"><input type="checkbox" id="bot-toggle-church"> Uzdrowienie w Kościele</label></div>
+                <div class="bf-row-left" style="margin-top: 5px;"><label style="font-weight:bold; color:#ffcc33;">╰ Idź do Kościoła, gdy HP spadnie do:</label></div>
+                <select id="bot-church-hp" class="bf-sel" style="margin-bottom: 5px;">
+                    <option value="0.30">30%</option><option value="0.25">25%</option><option value="0.20">20%</option><option value="0.15" selected>15%</option><option value="0.10">10%</option>
+                </select>
                 <div style="color: #aaa; font-size: 10px; margin-left: 24px;">Akceptuj max. koszt leczenia:</div>
                 <select id="bot-church-ap" class="bf-sel" style="margin-left: 24px; width: calc(100% - 24px); margin-bottom: 10px;">
                     <option value="5">Do 5 Punktów Akcji (PA)</option><option value="10">Do 10 Punktów Akcji (PA)</option><option value="20">Do 20 Punktów Akcji (PA)</option><option value="40">Do 40 Punktów Akcji (PA)</option><option value="80">Do 80 Punktów Akcji (PA)</option>
                 </select>
+
+                <div class="bf-hr"></div>
+                <div class="bf-row-left" style="margin-top: 10px;"><label style="font-weight:bold; color:#ff5555;">🛡️ Ucieczka (Wyjdź z Lasu), gdy HP wynosi:</label></div>
+                <select id="bot-safe-hp" class="bf-sel" style="margin-bottom: 10px;">
+                    <option value="0.15">15% (Wysokie ryzyko)</option><option value="0.25">25% (Podwyższone ryzyko)</option><option value="0.35">35% (Zbalansowane)</option><option value="0.50">50% (Bezpieczne)</option><option value="0.65">65% (Bardzo ostrożnie)</option>
+                </select>
+
                 <div class="bf-hr"></div>
                 <div class="bf-row-left"><label style="font-weight:bold; color:#fff;"><input type="checkbox" id="bot-toggle-graveyard"> Praca (Cmentarz), gdy brak PA</label></div>
                 <select id="bot-graveyard-time" class="bf-sel" style="margin-left: 24px; width: calc(100% - 24px);">${graveyardOptions}</select>
@@ -237,8 +246,9 @@
         btnReset.addEventListener('click', () => {
             localStorage.removeItem('lastLifePotionUse'); localStorage.removeItem('lastEnergyPotionUse');
             localStorage.removeItem('needsLifePotion'); localStorage.removeItem('needsEnergyPotion');
+            localStorage.removeItem('nextChurchUse');
             [1, 2, 3, 4, 5].forEach(id => localStorage.removeItem(`nextRuin_${id}`));
-            logToGUI("🔄 Pamięć wyczyszczona (Zresetowano czasy Ruin)!", "#ffff00");
+            logToGUI("🔄 Pamięć wyczyszczona (Zresetowano czasy Ruin i Kościoła)!", "#ffff00");
         });
 
         const setupCb = (id, key, def) => {
@@ -295,8 +305,11 @@
         });
 
         setupCb('bot-potion-life', 'botCfg_PotionLife', true); setupSel('bot-potion-type', 'botCfg_PotionType');
+        setupSel('bot-potion-hp', 'botCfg_PotionHp'); // NOWY SUWAK DLA MIKSTUR
         setupCb('bot-potion-energy', 'botCfg_PotionEnergy', false); setupCb('bot-potion-autobuy', 'botCfg_PotionAutoBuy', false);
-        setupSel('bot-safe-hp', 'botCfg_SafeHp'); setupCb('bot-toggle-church', 'botCfg_Church', true); setupSel('bot-church-ap', 'botCfg_ChurchApMax');
+        setupSel('bot-safe-hp', 'botCfg_SafeHp');
+        setupCb('bot-toggle-church', 'botCfg_Church', true); setupSel('bot-church-ap', 'botCfg_ChurchApMax');
+        setupSel('bot-church-hp', 'botCfg_ChurchHp'); // NOWY SUWAK DLA KOŚCIOŁA
         setupCb('bot-toggle-clan', 'botCfg_Clan', true); setupCb('bot-toggle-ruins', 'botCfg_Ruins', true);
         setupCb('bot-toggle-hunt', 'botCfg_Hunt', false); setupSel('bot-hunt-location', 'botCfg_HuntLocation');
         setupCb('bot-toggle-hunt-spheres-only', 'botCfg_HuntSpheresOnly', true);
@@ -528,30 +541,38 @@
     async function backgroundChurchHeal() {
         const doc = await fetchPage(churchLink);
         if (!doc) return false;
-        const churchContainer = doc.getElementById('church');
-        if (!churchContainer) return false;
 
+        const docText = doc.body ? doc.body.textContent.replace(/\s+/g, ' ') : "";
         const maxAp = parseInt(localStorage.getItem('botCfg_ChurchApMax') || '10', 10);
-        const apMatch = churchContainer.innerHTML.match(/(\d+)\s*(?:&nbsp;)?<img[^>]*alt="Punkty Akcji"/i);
+        const apMatch = docText.match(/za\s*(\d+)\s*PA/i);
         const apCost = apMatch ? parseInt(apMatch[1], 10) : 0;
 
-        if (Array.from(doc.querySelectorAll("#church p")).some(p => p.textContent.includes("100% maksymalnego zdrowia"))) {
-            if (apCost <= maxAp) {
-                const healButton = doc.querySelector("input.btn[value='Uzdrowienie']");
-                if (healButton) {
-                    logToGUI(`⛪ Leczę się w kościele za ${apCost} PA!`, "#00ff00");
-                    localStorage.setItem('lastChurchUse', Date.now().toString());
-                    await wait(getRandomDelay());
-                    await submitBackgroundFormOrLink(healButton, churchLink);
-                    return true;
-                }
+        const healButton = doc.querySelector('input[name="heal"][value="Uzdrowienie"]');
+
+        if (docText.includes("100% maksymalnego zdrowia") && healButton) {
+            let waitTimeMs = 121 * 60 * 1000;
+            const timeMatch = docText.match(/odczeka[ćc]\s*(\d{2}:\d{2}:\d{2})/i);
+
+            if (apCost <= maxAp && apCost > 0) {
+                if (timeMatch) waitTimeMs = parseTimeToMs(timeMatch[1]) + 5000;
+
+                logToGUI(`⛪ Leczę się w kościele za ${apCost} PA!`, "#00ff00");
+                localStorage.setItem('nextChurchUse', (Date.now() + waitTimeMs).toString());
+
+                await wait(getRandomDelay());
+                await submitBackgroundFormOrLink(healButton, churchLink);
+                return true;
             } else {
                 logToGUI(`⛪ Kościół zignorowany (${apCost} PA > limit ${maxAp} PA).`, "#ffaa00");
-                localStorage.setItem('lastChurchUse', (Date.now() + 15 * 60 * 1000).toString());
+                if (timeMatch && !docText.includes("odczekać 00:00:00")) waitTimeMs = parseTimeToMs(timeMatch[1]) + 5000;
+                else waitTimeMs = 15 * 60 * 1000;
+
+                localStorage.setItem('nextChurchUse', (Date.now() + waitTimeMs).toString());
                 return false;
             }
         }
-        localStorage.setItem('lastChurchUse', Date.now().toString());
+
+        localStorage.setItem('nextChurchUse', (Date.now() + 15 * 60 * 1000).toString());
         return false;
     }
 
@@ -583,7 +604,6 @@
         return false;
     }
 
-    // ZMIANA: Użycie window.$.ajax pozwala na bezbłędny zakup wojska
     async function backgroundTraining(stats) {
         const unitId = localStorage.getItem('botCfg_TrainUnit') || '1';
         const costPerUnit = unitCosts[unitId] || 10;
@@ -629,7 +649,6 @@
         return false;
     }
 
-    // ZMIANA: Zabezpieczenie przed pustym textContent dla cmentarza
     async function backgroundGraveyard() {
         const doc = await fetchPage(graveyardLink);
         if (!doc) return false;
@@ -1000,7 +1019,9 @@
                         doAdv: localStorage.getItem('botCfg_Adventure') === 'true',
                         doGrotte: localStorage.getItem('botCfg_Grotte') === 'true',
                         doGrave: localStorage.getItem('botCfg_Graveyard') !== 'false',
-                        safeHp: parseFloat(localStorage.getItem('botCfg_SafeHp') || '0.50')
+                        safeHp: parseFloat(localStorage.getItem('botCfg_SafeHp') || '0.50'),
+                        potionHp: parseFloat(localStorage.getItem('botCfg_PotionHp') || '0.80'),
+                        churchHp: parseFloat(localStorage.getItem('botCfg_ChurchHp') || '0.15')
                     };
 
                     const selectEl = document.getElementById('bot-potion-type');
@@ -1021,15 +1042,15 @@
                     if (cfg.doAutoBuy && cfg.doPotEnergy && localStorage.getItem('needsEnergyPotion') === 'true') { if(await backgroundBuyItem(potionEnergyName, 'needsEnergyPotion')) { isWorking = false; setTimeout(startBotLoop, getRandomDelay()); return; } }
 
                     // 2. LECZENIE W TLE (HP i AP)
-                    if (stats.currentHP < (stats.maxHP * healthCriticalPercent)) {
+                    if (stats.currentHP < (stats.maxHP * cfg.churchHp)) {
                         if (cfg.doPotLife && (Date.now() - parseInt(localStorage.getItem('lastLifePotionUse') || '0', 10) > potionScriptCooldown)) {
                             if (await backgroundUseItem(profileDoc, cfg.potLifeName, 'lastLifePotionUse', 'needsLifePotion')) { isWorking = false; setTimeout(startBotLoop, getRandomDelay()); return; }
                         }
-                        if (cfg.doChurch && (Date.now() - parseInt(localStorage.getItem('lastChurchUse') || '0', 10) > churchScriptCooldown)) {
+                        if (cfg.doChurch && (Date.now() > parseInt(localStorage.getItem('nextChurchUse') || '0', 10))) {
                             if (await backgroundChurchHeal()) { isWorking = false; setTimeout(startBotLoop, getRandomDelay()); return; }
                         }
                     }
-                    if (cfg.doPotLife && stats.currentHP < (stats.maxHP * healthTriggerPercent)) {
+                    if (cfg.doPotLife && stats.currentHP < (stats.maxHP * cfg.potionHp)) {
                         if (Date.now() - parseInt(localStorage.getItem('lastLifePotionUse') || '0', 10) > potionScriptCooldown) {
                             if (await backgroundUseItem(profileDoc, cfg.potLifeName, 'lastLifePotionUse', 'needsLifePotion')) { isWorking = false; setTimeout(startBotLoop, getRandomDelay()); return; }
                         }
