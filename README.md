@@ -14,17 +14,18 @@ Dzięki pełnemu wdrożeniu asynchronicznych zapytań sieciowych (**AJAX / Fetch
 ## 🌟 Główne Funkcje (Features)
 
 ### 💻 Nowoczesny Interfejs Użytkownika (GUI)
-* **Pływający Panel Konfiguracyjny:** Elegancki, dopasowany do klimatu gry panel boczny, pozwalający na zarządzanie wszystkimi modułami bota w czasie rzeczywistym.
+* **Panel Konfiguracyjny:** Elegancki, dopasowany do klimatu gry panel boczny, pozwalający na zarządzanie wszystkimi modułami bota w czasie rzeczywistym.
 * **Konsola Logów (Live):** Zintegrowany podgląd działań bota. Śledź na bieżąco zdobywane Sfery, postęp w Lesie czy zakupy w Jamie Lęgowej, bez konieczności otwierania konsoli deweloperskiej.
 * **Zabezpieczenia anty-blokadowe:** Konfigurowalne opóźnienia kliknięć (od trybu "Szybki" po "Bezpieczny/Ludzki"), zapobiegające wykryciu nienaturalnej aktywności przez serwer.
 
-### 🩸 Dynamiczne Zarządzanie Zdrowiem (NOWOŚĆ w v30.3)
+### 🩸 Przetrwanie i Dynamiczne Zdrowie
 * **Precyzyjne progi leczenia:** W pełni konfigurowalne suwaki z poziomu GUI – sam decydujesz, przy ilu procentach HP bot pije mikstury, a kiedy udaje się do kapłana.
 * **Inteligentny Kościół:** Algorytm odczytujący mnożniki prędkości serwera w czasie rzeczywistym, wyliczający dokładny czas odnowienia (cooldown) i pilnujący maksymalnego kosztu leczenia w PA.
-* **Moduł Przetrwania:** Suwak "Ucieczki", który całkowicie zatrzymuje wyprawy (zabezpieczenie przed śmiercią postaci), gdy HP spadnie do niebezpiecznego poziomu.
+* **Zarządzanie Energią (PA):** Automatyczne picie zwykłych Mikstur Energii (+10 PA) oraz **Eliksirów Energii Premium (+80 PA)**, gdy zapas punktów spadnie poniżej odpowiedniego poziomu.
+* **Moduł Ucieczki:** Suwak "Ucieczki", który całkowicie zatrzymuje wyprawy (zabezpieczenie przed śmiercią postaci), gdy HP spadnie do niebezpiecznego poziomu.
 
 ### ⚔️ Moduł Polowania i Przygód
-* **Zaawansowane Sfery Ekstrakcji:** Inteligentny odbiór Sfer na podstawie wybranych rang (od S do F). Bot potrafi ominąć pętle przekierowań serwera (Status 303) i bezpiecznie deponować łupy w slotach.
+* **Zaawansowane Sfery Ekstrakcji:** Inteligentny odbiór Sfer na podstawie wybranych rang (od S do F). Bot potrafi ominąć pętle przekierowań serwera (Status 303) i bezpiecznie deponować łupy w wolnych slotach.
 * **Przygoda w Lesie z systemem logiki:** Rozpoznawanie aktualnego postępu misji (np. *Zwłoki (90/120)*). Konfigurowalne strategie wyborów (Max Exp/Złoto, Aspekty Natury, Zniszczenia, Wiedzy itp.). Zawsze logicznie zamyka i dokańcza aktywne wyprawy.
 * **Grota i Polowanie na Ludzi:** Zautomatyzowane ataki z pełną obsługą limitów Punktów Akcji (PA).
 
@@ -33,9 +34,9 @@ Dzięki pełnemu wdrożeniu asynchronicznych zapytań sieciowych (**AJAX / Fetch
 * **Błyskawiczny Auto-Meldunek:** Bot działa jako asystent wojenny, cyklicznie sprawdzając kwaterę główną (co 10 minut) i automatycznie dołączając do wojen klanowych.
 
 ### 💰 Ekonomia i Rozwój Postaci
+* **Smart Atrybuty (Najtańszy priorytet):** Bot czyta ceny zaznaczonych atrybutów i inwestuje złoto zawsze w ten **najtańszy**, zapewniając zrównoważony i optymalny rozwój postaci.
 * **Jamy Lęgowe (Wojsko):** Wykorzystanie natywnych instrukcji gry (jQuery $.ajax) do bezbłędnego zakupu wojska za krew.
-* **Rozwój Atrybutów:** Automatyczne inwestowanie nadmiaru złota w wybrane statystyki (Siła, Obrona, Zwinność itp.).
-* **Inteligentny Cmentarz:** Gdy Punkty Akcji (PA) spadną do określonego progu, bot kulturalnie doprowadzi trwającą przygodę do końca i wyśle postać do pracy na wyznaczony czas, usypiając swoje procesy dla oszczędności zasobów.
+* **Inteligentny Cmentarz:** Gdy Punkty Akcji (PA) spadną do określonego progu, bot kulturalnie doprowadzi trwającą przygodę do końca i wyśle postać do pracy na wyznaczony czas, usypiając swoje procesy dla oszczędności zasobów (komputera/VPS/telefonu).
 
 ---
 
