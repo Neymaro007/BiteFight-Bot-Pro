@@ -1,6 +1,6 @@
-# 🦇 BiteFight Bot Pro v30.3 (AJAX Edition)
+# 🦇 BiteFight Bot Pro v30.4 (AJAX Edition)
 
-![Version](https://img.shields.io/badge/version-30.3-blue.svg)
+![Version](https://img.shields.io/badge/version-30.4-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-Tampermonkey-green.svg)
 ![Game](https://img.shields.io/badge/game-BiteFight-darkred.svg)
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC_BY--NC_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
