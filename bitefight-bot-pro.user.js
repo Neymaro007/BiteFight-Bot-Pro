@@ -1,11 +1,11 @@
 // ==UserScript==
-// @name         BiteFight Bot Pro v30.3 (AJAX GUI + Dynamiczne HP)
+// @name         BiteFight Bot Pro v30.4 (Eliksir Energii & Dynamiczne HP)
 // @namespace    http://tampermonkey.net/
-// @version      30.3
-// @description  W pełni konfigurowalne leczenie, 100% poprawny payload, obsługa kościoła.
-// @author       Neymaro007
+// @version      30.4
+// @description  W pełni konfigurowalne leczenie, 100% poprawny payload, obsługa kościoła i Eliksirów.
+// @author       Shakira & Pomocnik
 // @match        https://*.bitefight.gameforge.com/*
-// @grant        none 
+// @grant        none
 // @run-at       document-idle
 // ==/UserScript==
 
@@ -34,6 +34,7 @@
     const grotteLink = baseURL + "/city/grotte";
 
     const potionEnergyName = "Mikstura Energii";
+    const potionElixirEnergyName = "Eliksir Energii"; // NOWOŚĆ: Eliksir za PK
 
     const ruinsLevels = [
         { id: 1, unit1: 4, unit2: 4 },
@@ -109,7 +110,7 @@
                 #bf-bot-panel::-webkit-scrollbar-track { background: #0d0404; border-radius: 4px; }
                 #bf-bot-panel::-webkit-scrollbar-thumb { background: #7a0000; border-radius: 4px; }
             </style>
-            <h3 style="margin: 0 0 5px 0; text-align: center; color: #ff3333; text-transform: uppercase; letter-spacing: 2px; font-size: 15px; text-shadow: 2px 2px 4px black;">BiteFight Bot v30.3</h3>
+            <h3 style="margin: 0 0 5px 0; text-align: center; color: #ff3333; text-transform: uppercase; letter-spacing: 2px; font-size: 15px; text-shadow: 2px 2px 4px black;">BiteFight Bot v30.4</h3>
             <div style="text-align: center; margin-bottom: 12px;">
                 <label style="color:#aaa; font-size: 11px;">🌍 Serwer:</label>
                 <select id="bot-server-select" class="bf-sel" style="width: auto; display: inline-block; margin-left: 5px; padding: 2px 5px; margin-right: 10px;">
@@ -182,6 +183,7 @@
             </div>
             <div class="bf-sec" style="margin-bottom: 0;">
                 <div class="bf-sec-title">🩸 Przetrwanie i Regeneracja</div>
+
                 <div class="bf-row-left"><label style="font-weight:bold; color:#fff;"><input type="checkbox" id="bot-potion-life"> Pij Mikstury Leczące:</label></div>
                 <select id="bot-potion-type" class="bf-sel" style="margin-bottom: 5px;">
                     <option value="Mała Uzdrawiająca Mikstura">Mała Uzdrawiająca (od 1 lvl)</option><option value="Średnia Uzdrawiająca Mikstura">Średnia Uzdrawiająca (od 3 lvl)</option><option value="Zupa Życia">Zupa Życia (od 75 lvl)</option>
@@ -191,7 +193,8 @@
                     <option value="0.90">90%</option><option value="0.80" selected>80%</option><option value="0.70">70%</option><option value="0.60">60%</option><option value="0.50">50%</option>
                 </select>
 
-                <div class="bf-row-left"><label style="font-weight:bold; color:#fff;"><input type="checkbox" id="bot-potion-energy"> Pij Mikstury Energii (PA)</label></div>
+                <div class="bf-row-left"><label style="font-weight:bold; color:#fff;"><input type="checkbox" id="bot-potion-energy"> Pij Mikstury Energii (Złoto, +10 PA)</label></div>
+                <div class="bf-row-left" style="margin-top: 5px;"><label style="font-weight:bold; color:#ff9900;"><input type="checkbox" id="bot-potion-elixir-energy"> Pij Eliksir Energii (za PK, +80 PA)</label></div>
                 <div class="bf-row-left" style="margin-top: 10px; margin-bottom: 10px;"><label style="font-weight:bold; color:#00ff00;"><input type="checkbox" id="bot-potion-autobuy"> Auto-Kupowanie brakujących mikstur</label></div>
 
                 <div class="bf-hr"></div>
@@ -245,7 +248,9 @@
 
         btnReset.addEventListener('click', () => {
             localStorage.removeItem('lastLifePotionUse'); localStorage.removeItem('lastEnergyPotionUse');
+            localStorage.removeItem('lastElixirEnergyUse');
             localStorage.removeItem('needsLifePotion'); localStorage.removeItem('needsEnergyPotion');
+            localStorage.removeItem('needsElixirEnergy');
             localStorage.removeItem('nextChurchUse');
             [1, 2, 3, 4, 5].forEach(id => localStorage.removeItem(`nextRuin_${id}`));
             logToGUI("🔄 Pamięć wyczyszczona (Zresetowano czasy Ruin i Kościoła)!", "#ffff00");
@@ -305,11 +310,13 @@
         });
 
         setupCb('bot-potion-life', 'botCfg_PotionLife', true); setupSel('bot-potion-type', 'botCfg_PotionType');
-        setupSel('bot-potion-hp', 'botCfg_PotionHp'); // NOWY SUWAK DLA MIKSTUR
-        setupCb('bot-potion-energy', 'botCfg_PotionEnergy', false); setupCb('bot-potion-autobuy', 'botCfg_PotionAutoBuy', false);
+        setupSel('bot-potion-hp', 'botCfg_PotionHp');
+        setupCb('bot-potion-energy', 'botCfg_PotionEnergy', false);
+        setupCb('bot-potion-elixir-energy', 'botCfg_PotionElixirEnergy', false); // NOWOŚĆ: Zapis eliksiru w panelu
+        setupCb('bot-potion-autobuy', 'botCfg_PotionAutoBuy', false);
         setupSel('bot-safe-hp', 'botCfg_SafeHp');
         setupCb('bot-toggle-church', 'botCfg_Church', true); setupSel('bot-church-ap', 'botCfg_ChurchApMax');
-        setupSel('bot-church-hp', 'botCfg_ChurchHp'); // NOWY SUWAK DLA KOŚCIOŁA
+        setupSel('bot-church-hp', 'botCfg_ChurchHp');
         setupCb('bot-toggle-clan', 'botCfg_Clan', true); setupCb('bot-toggle-ruins', 'botCfg_Ruins', true);
         setupCb('bot-toggle-hunt', 'botCfg_Hunt', false); setupSel('bot-hunt-location', 'botCfg_HuntLocation');
         setupCb('bot-toggle-hunt-spheres-only', 'botCfg_HuntSpheresOnly', true);
@@ -525,7 +532,11 @@
                     if (resultDoc) {
                         logToGUI(`✅ Zakupiono: ${itemName}`, "#00ff00");
                         localStorage.setItem('bot_lastBuy_' + storageNeedBuy, Date.now().toString());
-                        const cdKey = storageNeedBuy === 'needsLifePotion' ? 'lastLifePotionUse' : 'lastEnergyPotionUse';
+
+                        let cdKey = 'lastEnergyPotionUse';
+                        if (storageNeedBuy === 'needsLifePotion') cdKey = 'lastLifePotionUse';
+                        else if (storageNeedBuy === 'needsElixirEnergy') cdKey = 'lastElixirEnergyUse';
+
                         localStorage.setItem(cdKey, (Date.now() - potionScriptCooldown).toString());
                         return true;
                     }
@@ -534,7 +545,11 @@
         }
 
         logToGUI(`❌ Błąd zakupu ${itemName}. (Blokada 10 min)`, "#ff3333");
-        localStorage.setItem(storageNeedBuy === 'needsLifePotion' ? 'lastLifePotionUse' : 'lastEnergyPotionUse', (Date.now() - potionScriptCooldown + (10 * 60 * 1000)).toString());
+
+        let cdKeyFail = 'lastEnergyPotionUse';
+        if (storageNeedBuy === 'needsLifePotion') cdKeyFail = 'lastLifePotionUse';
+        else if (storageNeedBuy === 'needsElixirEnergy') cdKeyFail = 'lastElixirEnergyUse';
+        localStorage.setItem(cdKeyFail, (Date.now() - potionScriptCooldown + (10 * 60 * 1000)).toString());
         return false;
     }
 
@@ -581,30 +596,27 @@
         if (savedAttrs.length === 0) return false;
 
         const attrRows = profileDoc.querySelectorAll("#skills_tab table tr");
-        let availableUpgrades = []; // Tu bot zbierze atrybuty, na które go stać
+        let availableUpgrades = [];
 
         for (let row of Array.from(attrRows)) {
             const labelTd = row.querySelector("td:first-child");
             if (!labelTd) continue;
 
             const attrName = labelTd.textContent.replace(':', '').trim();
-            if (!savedAttrs.includes(attrName)) continue; // Ignoruje niezaznaczone
+            if (!savedAttrs.includes(attrName)) continue;
 
             const costMatch = row.textContent.match(/kosztuje:\s*([\d.]+)/i);
             if (costMatch) {
                 const cost = parseInt(costMatch[1].replace(/\./g, ''), 10);
                 const plusBtnLink = row.querySelector("a[href*='/profile/training/']");
 
-                // Jeśli stać nas na ten atrybut, dodajemy go do "koszyka"
                 if (plusBtnLink && stats.gold >= cost) {
                     availableUpgrades.push({ name: attrName, cost: cost, btn: plusBtnLink });
                 }
             }
         }
 
-        // Jeśli mamy na liście przynajmniej jeden atrybut, na który nas stać...
         if (availableUpgrades.length > 0) {
-            // ...sortujemy je po cenie rosnąco (najtańszy ląduje na początku listy)
             availableUpgrades.sort((a, b) => a.cost - b.cost);
             const cheapestUpgrade = availableUpgrades[0];
 
@@ -614,7 +626,6 @@
             return true;
         }
 
-        // Jeśli bota nie stać na NIC, usypia moduł atrybutów na 5 minut
         localStorage.setItem('bot_NextAttrCheck', (Date.now() + 5 * 60 * 1000).toString());
         return false;
     }
@@ -1023,6 +1034,7 @@
                     const cfg = {
                         doPotLife: localStorage.getItem('botCfg_PotionLife') !== 'false',
                         doPotEnergy: localStorage.getItem('botCfg_PotionEnergy') === 'true',
+                        doPotElixirEnergy: localStorage.getItem('botCfg_PotionElixirEnergy') === 'true', // NOWOŚĆ
                         doAutoBuy: localStorage.getItem('botCfg_PotionAutoBuy') === 'true',
                         potLifeName: localStorage.getItem('botCfg_PotionType') || 'Mała Uzdrawiająca Mikstura',
                         doChurch: localStorage.getItem('botCfg_Church') !== 'false',
@@ -1055,6 +1067,7 @@
                     // 1. ZAKUPY W TLE
                     if (cfg.doAutoBuy && cfg.doPotLife && localStorage.getItem('needsLifePotion') === 'true') { if(await backgroundBuyItem(cfg.potLifeName, 'needsLifePotion')) { isWorking = false; setTimeout(startBotLoop, getRandomDelay()); return; } }
                     if (cfg.doAutoBuy && cfg.doPotEnergy && localStorage.getItem('needsEnergyPotion') === 'true') { if(await backgroundBuyItem(potionEnergyName, 'needsEnergyPotion')) { isWorking = false; setTimeout(startBotLoop, getRandomDelay()); return; } }
+                    if (cfg.doAutoBuy && cfg.doPotElixirEnergy && localStorage.getItem('needsElixirEnergy') === 'true') { if(await backgroundBuyItem(potionElixirEnergyName, 'needsElixirEnergy')) { isWorking = false; setTimeout(startBotLoop, getRandomDelay()); return; } } // NOWOŚĆ
 
                     // 2. LECZENIE W TLE (HP i AP)
                     if (stats.currentHP < (stats.maxHP * cfg.churchHp)) {
@@ -1073,6 +1086,12 @@
                     if (cfg.doPotEnergy && stats.currentAP <= (stats.maxAP - 20)) {
                         if (Date.now() - parseInt(localStorage.getItem('lastEnergyPotionUse') || '0', 10) > potionScriptCooldown) {
                             if (await backgroundUseItem(profileDoc, potionEnergyName, 'lastEnergyPotionUse', 'needsEnergyPotion')) { isWorking = false; setTimeout(startBotLoop, getRandomDelay()); return; }
+                        }
+                    }
+                    // NOWOŚĆ: Eliksir Energii
+                    if (cfg.doPotElixirEnergy && stats.currentAP <= (stats.maxAP - 100)) {
+                        if (Date.now() - parseInt(localStorage.getItem('lastElixirEnergyUse') || '0', 10) > potionScriptCooldown) {
+                            if (await backgroundUseItem(profileDoc, potionElixirEnergyName, 'lastElixirEnergyUse', 'needsElixirEnergy')) { isWorking = false; setTimeout(startBotLoop, getRandomDelay()); return; }
                         }
                     }
 
