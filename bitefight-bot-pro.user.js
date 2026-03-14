@@ -3,7 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version      30.4
 // @description  W pełni konfigurowalne leczenie, 100% poprawny payload, obsługa kościoła i Eliksirów.
-// @author       Shakira & Pomocnik
+// @author       Neymaro007
 // @match        https://*.bitefight.gameforge.com/*
 // @grant        none
 // @run-at       document-idle
